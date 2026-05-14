@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Etiometrix — Análise técnica de nexo causal médico-hospitalar</title>
+<meta name="description" content="Pareceres técnicos com rigor metodológico, na convergência entre Medicina, Engenharia e Análise de Dados. Assistência técnica para advocacia, hospitais, operadoras e seguradoras." />
+<meta property="og:title" content="Etiometrix — Análise técnica de nexo causal médico-hospitalar" />
+<meta property="og:description" content="Convergência analítica entre medicina, engenharia e dados." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Preload Roboto 400 (body) e Archivo Black (display) — UI-UX Pro Max §3 perf -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Roboto:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap">
+<!-- Archivo Black substitui Nexa Heavy (proprietária) com caráter equivalente; Roboto = body oficial DS; JetBrains Mono = dado técnico -->
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Roboto:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   ETIOMETRIX — TOKENS OFICIAIS DO DESIGN SYSTEM
+   ============================================================ */
+:root{
+  /* Brand — DS oficial */
+  --primary:#1D1D1B;
+  --secondary:#DEE3E4;
+  --accent:#5E82B0;
+
+  /* UI — surface tonal variant (warm editorial paper) */
+  --bg:#F6F4EE;
+  --fg:#1D1D1B;
+  --muted:#ECE8DE;
+  --border:rgba(29,29,27,.18);
+  --border-strong:rgba(29,29,27,.32);
+  --muted-fg:#5A5A57;
+  --destructive:#D4183D;
+  --ring:#5E82B0;
+
+  /* Type — DS oficial */
+  --font-display:'Archivo Black','Nexa Heavy','Roboto',sans-serif;
+  --font-body:'Roboto',sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+
+  --t-display:clamp(2.25rem,4.4vw,3.75rem);   /* hero */
+  --t-h1:3rem;        /* 48 */
+  --t-h2:2rem;        /* 32 */
+  --t-h3:1.5rem;      /* 24 */
+  --t-lg:1.125rem;    /* 18 */
+  --t-md:1rem;        /* 16 */
+  --t-sm:.875rem;     /* 14 */
+  --t-xs:.75rem;      /* 12 */
+  --t-2xs:.6875rem;   /* 11 */
+
+  /* Spacing — 8px Base Grid DS oficial */
+  --s-3xs:2px;  --s-2xs:4px; --s-xs:8px;
+  --s-sm:16px;  --s-md:24px; --s-lg:32px;
+  --s-xl:48px;  --s-2xl:64px;--s-3xl:80px;
+  --s-4xl:96px;
+
+  /* Radius — DS oficial */
+  --r-0:0; --r-sm:4px; --r-md:8px;
+
+  /* Grid — DS oficial */
+  --max:1280px;
+  --gutter:24px;
+}
+
+/* ============================================================
+   DARK MODE — tokens DS oficiais (estrito)
+   ============================================================ */
+@media (prefers-color-scheme: dark){
+  :root{
+    --primary:#DEE3E4;
+    --secondary:#2A2828;
+    --accent:#5E82B0;
+    --bg:#1A1A1A;
+    --fg:#DEE3E4;
+    --muted:#2A2828;
+    --border:#2A2828;
+    --border-strong:rgba(222,227,228,.25);
+    --muted-fg:#9AA0A1;
+    --ring:#5E82B0;
+  }
+}
+[data-theme="dark"]{
+  --primary:#DEE3E4;
+  --secondary:#2A2828;
+  --accent:#5E82B0;
+  --bg:#1A1A1A;
+  --fg:#DEE3E4;
+  --muted:#2A2828;
+  --border:#2A2828;
+  --border-strong:rgba(222,227,228,.25);
+  --muted-fg:#9AA0A1;
+  --ring:#5E82B0;
+}
+/* Override manual para forçar light mode mesmo com SO em dark */
+html[data-theme="light"],
+html[data-theme="light"]:root{
+  --primary:#1D1D1B !important;
+  --secondary:#DEE3E4 !important;
+  --accent:#5E82B0 !important;
+  --bg:#F6F4EE !important;
+  --fg:#1D1D1B !important;
+  --muted:#ECE8DE !important;
+  --border:rgba(29,29,27,.18) !important;
+  --border-strong:rgba(29,29,27,.32) !important;
+  --muted-fg:#5A5A57 !important;
+  --destructive:#D4183D !important;
+  --ring:#5E82B0 !important;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;scroll-behavior:smooth;scroll-padding-top:140px}
+body{
+  font-family:var(--font-body);
+  font-weight:400;
+  font-size:var(--t-md);
+  line-height:1.6;
+  color:var(--fg);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+  font-feature-settings:"kern" 1,"liga" 1,"calt" 1,"ss01" 1;
+  -webkit-font-feature-settings:"kern" 1,"liga" 1;
+  font-kerning:normal;
+  overflow-x:hidden;
+  transition:background-color .3s ease, color .3s ease;
+}
+::selection{background:var(--accent);color:#fff;text-shadow:none}
+::-moz-selection{background:var(--accent);color:#fff}
+/* iOS Safari: elimina delay de 300ms em taps e melhora performance touch */
+a,button,[role="button"]{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+/* Anchor scroll respect sticky topbar */
+section[id], main[id]{scroll-margin-top:130px}
+
+/* Subtle paper texture across the page — recalls scientific document */
+body::before{
+  content:"";
+  position:fixed;inset:0;
+  pointer-events:none;
+  z-index:1;
+  opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;
+}
+@media (prefers-color-scheme: dark){
+  body::before{mix-blend-mode:screen;opacity:.06}
+}
+
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:900;letter-spacing:-.015em;line-height:1.15}
+h1{font-size:var(--t-h1);line-height:1.1}
+h2{font-size:var(--t-h2);line-height:1.12}
+h3{font-size:var(--t-h3);line-height:1.25}
+h4{font-size:var(--t-md);letter-spacing:0;line-height:1.3}
+p{line-height:1.7;color:var(--fg)}
+
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:0}
+img,svg{display:block;max-width:100%}
+
+/* === Focus rings — acessibilidade WCAG (UI-UX Pro Max · §1 a11y) === */
+:focus{outline:0}
+:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:3px;
+  border-radius:var(--r-sm);
+}
+.btn:focus-visible,a.btn:focus-visible{outline-offset:2px}
+
+/* === Tabular figures para dados numéricos === */
+.stat dd, .frente-tag, .svc-num, .degree-num, .method-step .dot{
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum" 1;
+}
+
+/* Skip link */
+.skip{
+  position:absolute;left:-9999px;top:0;
+  background:var(--primary);color:#fff;
+  padding:var(--s-xs) var(--s-sm);
+  font-family:var(--font-mono);font-size:var(--t-xs);
+  z-index:100;
+}
+.skip:focus{left:var(--s-sm);top:var(--s-sm)}
+
+/* ============================================================
+   LAYOUT — Container & Grid
+   ============================================================ */
+.shell{max-width:var(--max);margin:0 auto;padding:0 var(--s-md);position:relative;z-index:2}
+
+/* Editorial top rail — like a scientific journal masthead */
+.rail{
+  border-bottom:1px solid var(--border);
+  font-family:var(--font-mono);
+  font-size:var(--t-2xs);
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--muted-fg);
+}
+.rail-inner{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:var(--s-xs) var(--s-md);
+  max-width:var(--max);margin:0 auto;
+  gap:var(--s-md);
+}
+.rail .dot{
+  display:inline-block;width:6px;height:6px;background:var(--accent);border-radius:50%;
+  margin-right:var(--s-xs);vertical-align:middle;
+  box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent);
+  animation:rail-pulse 2.8s ease-in-out infinite;
+}
+@keyframes rail-pulse{
+  0%,100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent)}
+  50%{box-shadow:0 0 0 5px transparent}
+}
+@media(prefers-reduced-motion:reduce){.rail .dot{animation:none}}
+.rail-meta{display:flex;gap:var(--s-md)}
+.rail-meta span:not(:first-child){position:relative}
+.rail-meta span:not(:first-child)::before{content:"·";margin-right:var(--s-md);color:var(--border-strong)}
+@media(max-width:720px){.rail-meta{display:none}}
+
+/* ============================================================
+   TOPBAR
+   ============================================================ */
+.topbar{
+  position:sticky;top:0;z-index:20;
+  background:color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter:saturate(140%) blur(10px);
+  -webkit-backdrop-filter:saturate(140%) blur(10px);
+  border-bottom:1px solid var(--border);
+}
+/* Scroll progress bar — fio fino na base do topbar */
+.scroll-progress{
+  position:fixed;top:0;left:0;height:2px;width:0;
+  background:linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #000));
+  z-index:25;
+  transition:width .1s linear;
+  pointer-events:none;
+}
+@media(prefers-reduced-motion:reduce){.scroll-progress{display:none}}
+.topbar-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:var(--s-sm) var(--s-md);
+  max-width:var(--max);margin:0 auto;
+  gap:var(--s-md);
+}
+.brand{display:flex;align-items:center}
+.brand .logo{height:96px;width:auto;display:block;transition:transform .3s cubic-bezier(.2,.7,.2,1)}
+.brand:hover .logo{transform:scale(1.025)}
+@media(max-width:1100px){.brand .logo{height:80px}}
+@media(max-width:860px){.brand .logo{height:64px}}
+@media(max-width:520px){.brand .logo{height:48px}}
+.nav{display:flex;align-items:center;gap:var(--s-lg)}
+.nav a{
+  font-size:var(--t-sm);font-weight:500;
+  color:var(--fg);
+  position:relative;padding:var(--s-2xs) 0;
+}
+.nav a::after{
+  content:"";position:absolute;left:0;right:0;bottom:-2px;height:1px;
+  background:var(--primary);transform:scaleX(0);transform-origin:left;
+  transition:transform .25s ease;
+}
+.nav a:hover::after,.nav a:focus-visible::after,.nav a[aria-current="true"]::after{transform:scaleX(1)}
+.nav a[aria-current="true"]{color:var(--fg);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--s-xs);
+  font-family:var(--font-body);font-size:var(--t-sm);font-weight:500;
+  padding:12px 22px;border-radius:var(--r-sm);
+  min-height:44px;       /* UI-UX Pro Max · §2 touch target */
+  letter-spacing:.01em;
+  transition:transform .2s cubic-bezier(.2,.7,.2,1), background .25s ease, color .25s ease, box-shadow .25s ease;
+  white-space:nowrap;
+  position:relative;
+}
+.btn-primary, .btn-accent{
+  box-shadow:inset 0 1px 0 0 color-mix(in srgb, #fff 18%, transparent), 0 1px 0 0 rgba(0,0,0,.04);
+}
+.btn-primary:hover, .btn-accent:hover{
+  box-shadow:inset 0 1px 0 0 color-mix(in srgb, #fff 22%, transparent), 0 8px 24px -10px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+/* btn-primary segue inversão automática do DS: bg=primary, fg=bg */
+.btn-primary{background:var(--primary);color:var(--bg);border:1px solid var(--primary)}
+.btn-primary:hover{background:var(--accent);border-color:var(--accent);color:#fff;transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0) scale(.98);transition-duration:.08s}
+.btn-accent{background:var(--accent);color:#fff;border:1px solid var(--accent)}
+.btn-accent:hover{background:color-mix(in srgb, var(--accent) 70%, #000);border-color:color-mix(in srgb, var(--accent) 70%, #000);transform:translateY(-1px)}
+.btn-accent:active{transform:translateY(0) scale(.98);transition-duration:.08s}
+.btn-ghost{background:transparent;color:var(--fg);border:1px solid var(--border-strong)}
+.btn-ghost:hover{background:color-mix(in srgb, var(--fg) 8%, transparent);color:var(--fg);border-color:var(--fg)}
+.btn-ghost:active{transform:scale(.98);transition-duration:.08s}
+/* Dark mode: btn-primary tem bg claro, então o inset shine branco fica inadequado */
+@media (prefers-color-scheme: dark){
+  .btn-primary{box-shadow:0 1px 0 0 rgba(0,0,0,.04)}
+  .btn-primary:hover{box-shadow:inset 0 1px 0 0 color-mix(in srgb, #fff 22%, transparent), 0 8px 24px -10px color-mix(in srgb, var(--accent) 60%, transparent)}
+}
+[data-theme="dark"] .btn-primary{box-shadow:0 1px 0 0 rgba(0,0,0,.04)}
+[data-theme="dark"] .btn-primary:hover{box-shadow:inset 0 1px 0 0 color-mix(in srgb, #fff 22%, transparent), 0 8px 24px -10px color-mix(in srgb, var(--accent) 60%, transparent)}
+.btn .arrow{transition:transform .2s ease}
+.btn:hover .arrow{transform:translateX(3px)}
+.burger{display:none;width:44px;height:44px;border:1px solid var(--border-strong);border-radius:var(--r-sm);place-items:center}
+.burger span{display:block;width:18px;height:1.5px;background:var(--fg);position:relative;transition:transform .25s ease}
+.burger span::before,.burger span::after{content:"";position:absolute;left:0;right:0;height:1.5px;background:var(--fg);transition:transform .25s ease,top .25s ease}
+.burger span::before{top:-5px}.burger span::after{top:5px}
+.burger[aria-expanded="true"] span{background:transparent}
+.burger[aria-expanded="true"] span::before{top:0;transform:rotate(45deg)}
+.burger[aria-expanded="true"] span::after{top:0;transform:rotate(-45deg)}
+@media(max-width:860px){
+  .topbar .nav,.topbar .btn-accent{display:none}
+  .burger{display:grid}
+}
+
+/* === Mobile drawer === */
+.drawer{
+  position:fixed;inset:0;z-index:30;
+  background:color-mix(in srgb, var(--bg) 98%, transparent);
+  backdrop-filter:saturate(140%) blur(8px);
+  display:flex;flex-direction:column;
+  padding:var(--s-3xl) var(--s-md) var(--s-md);
+  transform:translateY(-100%);transition:transform .35s cubic-bezier(.6,.05,.25,1), visibility 0s linear .35s;
+  pointer-events:none;
+  visibility:hidden;
+}
+.drawer.open{
+  transform:translateY(0);
+  pointer-events:auto;
+  visibility:visible;
+  transition:transform .35s cubic-bezier(.6,.05,.25,1), visibility 0s linear 0s;
+}
+/* No desktop o drawer não existe — evita qualquer vazamento de layout/scroll */
+@media(min-width:861px){
+  .drawer{display:none !important}
+}
+.drawer nav{display:flex;flex-direction:column;gap:var(--s-md)}
+.drawer nav a{
+  font-family:var(--font-display);font-size:2rem;letter-spacing:-.01em;
+  padding:var(--s-sm) 0;border-bottom:1px solid var(--border);
+  color:var(--fg);
+}
+.drawer .btn-accent{margin-top:var(--s-xl);align-self:flex-start}
+.drawer-meta{
+  margin-top:auto;padding-top:var(--s-lg);
+  font-family:var(--font-mono);font-size:var(--t-xs);
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted-fg);
+}
+@media(prefers-reduced-motion:reduce){.drawer{transition:none}}
+
+/* ============================================================
+   HERO — editorial, asymmetric
+   ============================================================ */
+.hero{
+  padding:var(--s-3xl) 0 var(--s-3xl);
+  border-bottom:1px solid var(--border);
+  position:relative;
+  overflow:hidden;
+}
+/* Hero — gradient mesh para atmosfera */
+.hero::before{
+  content:"";
+  position:absolute;inset:0;
+  background:
+    linear-gradient(180deg,transparent 0,color-mix(in srgb, var(--accent) 4%, transparent) 100%),
+    radial-gradient(900px 500px at 110% 20%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+    radial-gradient(700px 400px at -10% 80%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%);
+  pointer-events:none;
+  z-index:0;
+}
+/* Hero — engineering grid lines, super sutis */
+.hero::after{
+  content:"";
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size:96px 96px;
+  background-position:-1px -1px;
+  opacity:.4;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, #000 30%, transparent 90%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, #000 30%, transparent 90%);
+  pointer-events:none;
+  z-index:0;
+}
+.hero > .shell{position:relative;z-index:1}
+.hero-grid{
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:var(--s-3xl);
+  align-items:start;
+  position:relative;
+}
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:var(--t-xs);
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--muted-fg);
+  display:inline-flex;align-items:center;gap:var(--s-xs);
+  margin-bottom:var(--s-lg);
+}
+.eyebrow .bar{width:32px;height:1px;background:var(--accent);display:inline-block}
+.hero h1{
+  font-size:var(--t-display);
+  letter-spacing:-.01em;
+  line-height:1.12;
+  margin-bottom:var(--s-md);
+  padding:.05em .08em .05em 0;
+  overflow-wrap:break-word;
+  hyphens:auto;
+}
+.hero h1 .accent{
+  color:transparent;
+  background:linear-gradient(180deg,var(--accent) 0%,color-mix(in srgb, var(--accent) 70%, #000) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  font-style:italic;
+  display:inline-block;
+  padding:0 .25em 0 0;
+  margin-right:.05em;
+  letter-spacing:0;
+}
+.hero-sub{
+  font-size:var(--t-lg);
+  color:var(--muted-fg);
+  max-width:54ch;
+  margin-bottom:var(--s-xl);
+}
+.hero-cta{display:flex;gap:var(--s-sm);flex-wrap:wrap;margin-bottom:var(--s-2xl)}
+.hero-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:var(--s-sm);
+  border-top:1px solid var(--border);
+  padding-top:var(--s-lg);
+}
+.stat dt{
+  font-family:var(--font-mono);font-size:var(--t-2xs);
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted-fg);
+  margin-bottom:var(--s-xs);
+}
+.stat dd{
+  font-family:var(--font-display);font-size:2.25rem;line-height:1;
+  display:flex;align-items:baseline;gap:4px;
+}
+.stat dd small{font-size:.875rem;color:var(--muted-fg);font-family:var(--font-mono);font-weight:400}
+
+/* Right column — venn convergence diagram */
+.hero-figure{
+  position:relative;
+  padding:var(--s-md);
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  background:var(--bg);
+}
+.fig-label{
+  position:absolute;top:-10px;left:var(--s-md);
+  background:var(--bg);padding:0 var(--s-xs);
+  font-family:var(--font-mono);font-size:var(--t-2xs);
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted-fg);
+}
+.venn-wrap{display:flex;justify-content:center;align-items:center;padding:var(--s-lg) 0 var(--s-md)}
+.venn{width:100%;max-width:380px;height:auto}
+.venn-cap{
+  font-family:var(--font-mono);font-size:var(--t-xs);
+  color:var(--muted-fg);
+  text-align:center;
+  border-top:1px dashed var(--border);
+  padding-top:var(--s-sm);
+  margin-top:var(--s-sm);
+}
+.venn-cap strong{color:var(--fg);font-weight:500}
+
+@media(max-width:1100px){
+  .hero{padding:var(--s-2xl) 0}
+  .hero-grid{grid-template-columns:1fr;gap:var(--s-xl)}
+  .hero-stats{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:520px){
+  .hero-stats{grid-template-columns:1fr;gap:var(--s-md)}
+}
+
+/* ============================================================
+   SECTION SCAFFOLD
+   ============================================================ */
+section.block{padding:var(--s-4xl) 0;border-bottom:1px solid var(--border);position:relative}
+.section-head{
+  display:grid;grid-template-columns:1fr 1.6fr;gap:var(--s-xl);
+  margin-bottom:var(--s-2xl);
+  align-items:end;
+}
+.section-num{
+  font-family:var(--font-mono);font-size:var(--t-xs);
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted-fg);
+  margin-bottom:var(--s-sm);display:flex;align-items:center;gap:var(--s-xs);
+}
+.section-num::before{content:"§";color:var(--accent);font-family:var(--font-display);font-size:var(--t-md)}
+.section-num::after{
+  content:"";flex:0 0 48px;height:1px;background:var(--border-strong);margin-left:var(--s-xs);
+}
+.section-head h2{max-width:18ch}
+.section-lede{font-size:var(--t-lg);color:var(--muted-fg);max-width:50ch}
+@media(max-width:860px){
+  section.block{padding:var(--s-3xl) 0}
+  .section-head{grid-template-columns:1fr;gap:var(--s-md)}
+}
+
+/* ============================================================
+   SERVICES — 4 cards, editorial 2x2
+   ============================================================ */
+.services-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  border-top:1px solid var(--primary);
+}
+.service{
+  padding:var(--s-xl) var(--s-lg) var(--s-2xl);
+  border-bottom:1px solid var(--border);
+  border-right:1px solid var(--border);
+  position:relative;
+  background:var(--bg);
+  transition:background .35s ease;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.service .svc-link{margin-top:auto}
+.service::before{
+  content:"";
+  position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--accent);
+  transform:scaleY(0);transform-origin:top;
+  transition:transform .45s cubic-bezier(.2,.7,.2,1);
+}
+.service::after{
+  content:"";
+  position:absolute;right:var(--s-lg);bottom:var(--s-lg);
+  width:24px;height:24px;
+  background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E82B0' stroke-width='1.6'%3E%3Cpath d='M7 17L17 7M17 7H9M17 7V15'/%3E%3C/svg%3E");
+  opacity:0;transform:translate(-6px,6px);
+  transition:opacity .3s ease, transform .3s ease;
+}
+.service:nth-child(2n){border-right:0}
+.service:nth-last-child(-n+2){border-bottom:0}
+.service:hover{background:color-mix(in srgb, var(--fg) 7%, var(--bg))}
+.service:hover .svc-num{color:var(--accent)}
+.service:hover::before{transform:scaleY(1)}
+.service:hover::after{opacity:1;transform:none}
+.svc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--s-xl)}
+.svc-num{
+  font-family:var(--font-display);font-size:2.5rem;line-height:1;
+  color:var(--primary);transition:color .2s ease;
+}
+.svc-tag{
+  font-family:var(--font-mono);font-size:var(--t-2xs);
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted-fg);
+  border:1px solid var(--border-strong);padding:var(--s-3xs) var(--s-xs);
+  border-radius:var(--r-sm);
+  align-self:start;
+}
+.service h3{margin-bottom:var(--s-sm);max-width:18ch}
+.service p{color:var(--muted-fg);max-width:42ch;margin-bottom:var(--s-md)}
+.svc-link{
+  font-family:var(--font-mono);font-size:var(--t-xs);
+  letter-spacing:.12em;text-transform:uppercase;color:var(--primary);
+  display:inline-flex;align-items:center;gap:var(--s-xs);
+  border-bottom:1px solid var(--primary);padding-bottom:2px;
+}
+.svc-link .arrow{transition:transform .2s ease}
+.svc-link:hover .arrow{transform:translateX(4px)}
+@media(max-width:860px){
+  .services-grid{grid-template-columns:1fr}
+  .service,.service:nth-child(2n){border-right:0}
+  .service:nth-last-child(-n+2){border-bottom:1px solid var(--border)}
+  .service:last-child{border-bottom:0}
+}
+
+/* ============================================================
+   PULL QUOTE — manifesto editorial
+   ============================================================ */
+.pull{
+  padding:var(--s-4xl) 0;
+  border-bottom:1px solid var(--border);
+  background:color-mix(in srgb, var(--accent) 3%, var(--bg));
+  position:relative;
+}
+.pull::before{
+  content:"";
+  position:absolute;inset:0;
+  background:
+    radial-gradient(700px 300px at 50% 0%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 70%);
+  pointer-events:none;
+}
+.pull-inner{
+  max-width:920px;margin:0 auto;
+  text-align:center;
+  position:relative;z-index:1;
+}
+.pull-mark{
+  font-family:var(--font-display);font-size:4rem;
+  color:var(--accent);line-height:1;
+  margin-bottom:var(--s-sm);
+  user-select:none;
+}
+.pull-quote{
+  font-family:var(--font-display);
+  font-size:clamp(1.5rem,2.6vw,2.25rem);
+  line-height:1.3;
+  letter-spacing:-.01em;
+  color:var(--fg);
+  margin-bottom:var(--s-xl);
+}
+.pull-quote em{
+  color:var(--accent);
+  font-style:italic;
+  font-family:var(--font-display);
+}
+.pull-attr{
+  display:inline-flex;align-items:center;gap:var(--s-md);
+  font-family:var(--font-mono);font-size:var(--t-xs);
+  letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted-fg);
+}
+.pull-rule{
+  width:40px;height:1px;background:var(--border-strong);
+}
+@media(max-width:760px){
+  .pull{padding:var(--s-3xl) 0}
+  .pull-quote{font-size:1.375rem}
+}
+
+/* ============================================================
+   METHODOLOGY — process timeline (4 steps horizontal)
+   ============================================================ */
+.method-rail{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;
+  position:relative;
+}
+.method-rail::before{
+  content:"";position:absolute;top:24px;left:0;right:0;height:1px;
+  background:repeating-linear-gradient(90deg,var(--border-strong) 0 6px,transparent 6px 12px);
+  z-index:0;
+}
+.method-step{padding:0 var(--s-md) 0 0;position:relative;z-index:1}
+.method-step .dot{
+  width:48px;height:48px;border-radius:50%;background:var(--bg);
+  border:1px solid var(--primary);
+  display:grid;place-items:center;
+  font-family:var(--font-mono);font-size:var(--t-sm);font-weight:500;
+  margin-bottom:var(--s-md);
+}
+.method-step.is-accent .dot{background:var(--primary);color:var(--bg);border-color:var(--primary)}
+.method-step h3{
+  font-family:var(--font-display);font-size:var(--t-lg);
+  margin-bottom:var(--s-xs);max-width:14ch;line-height:1.2;
+}
+.method-step p{font-size:var(--t-sm);color:var(--muted-fg);max-width:24ch}
+@media(max-width:860px){
+  .method-rail{grid-template-columns:1fr;gap:var(--s-lg)}
+  .method-rail::before{display:none}
+  .method-step{padding-left:64px;position:relative}
+  .method-step .dot{position:absolute;left:0;top:0;margin:0}
+}
+
+/* ============================================================
+   CONSULTOR — split, with axial diagram
+   ============================================================ */
+.consultor{
+  display:grid;grid-template-columns:1.1fr .9fr;gap:var(--s-3xl);
+  align-items:start;
+}
+.consultor-card{
+  border:1px solid var(--border);padding:var(--s-xl);
+  border-radius:var(--r-md);background:var(--bg);
+}
+.cc-eyebrow{
+  font-family:var(--font-mono);font-size:var(--t-2xs);
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted-fg);
+  margin-bottom:var(--s-md);
+}
+.cc-name{
+  font-size:2.5rem;line-height:1.1;margin-bottom:var(--s-sm);padding-top:.05em;
+}
+.cc-name small{
+  font-family:var(--font-mono);font-size:var(--t-sm);font-weight:400;
+  letter-spacing:.04em;color:var(--muted-fg);display:block;margin-bottom:var(--s-xs);
+}
+.cc-roles{
+  display:flex;flex-wrap:wrap;gap:var(--s-xs);margin:var(--s-md) 0 var(--s-lg);
+  list-style:none;
+}
+.cc-roles li{
+  font-family:var(--font-mono);font-size:var(--t-2xs);
+  letter-spacing:.12em;text-transform:uppercase;
+  padding:var(--s-2xs) var(--s-xs);border:1px solid var(--border-strong);
+  border-radius:var(--r-sm);
+}
+.cc-bio{color:var(--muted-fg);max-width:56ch}
+.formation{
+  margin-top:var(--s-xl);padding-top:var(--s-lg);
+  border-top:1px solid var(--border);
+}
+.formation-title{
+  font-family:var(--font-mono);font-size:var(--t-2xs);
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted-fg);
+  margin-bottom:var(--s-md);
+}
+.formation-list{list-style:none;display:grid;gap:var(--s-md)}
+.formation-list li{
+  display:grid;grid-template-columns:auto 1fr;gap:var(--s-md);align-items:start;
+}
+.degree-num{
+  font-family:var(--font-mono);font-size:var(--t-xs);
+  color:var(--muted-fg);letter-spacing:.1em;
+  width:40px;border-top:2px solid var(--primary);padding-top:var(--s-xs);
+}
+.degree h4{font-family:var(--font-display);font-size:var(--t-md);margin-bottom:2px;letter-spacing:0}
+.degree .inst{font-family:var(--font-mono);font-size:var(--t-xs);color:color-mix(in srgb, var(--accent) 60%, var(--fg));letter-spacing:.06em;margin-bottom:var(--s-2xs)}
+.degree .focus{font-size:var(--t-sm);color:var(--muted-fg)}
+
+/* Right column — datasheet card (FIG. 02) */
+.axial{
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  background:var(--bg);
+  padding:var(--s-lg);
+}
+.axial-figcap{
+  font-family:var(--font-mono);font-size:var(--t-2xs);
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted-fg);
+  display:flex;justify-content:space-between;margin-bottom:var(--s-md);
+  padding-bottom:var(--s-sm);
+  border-bottom:1px dashed var(--border);
+}
+
+/* Datasheet — folha técnica do consultor */
+.datasheet{
+  display:flex;flex-direction:column;
+  border:1px solid var(--border);
+  border-radius:var(--r-sm);
+  overflow:hidden;
+  margin-bottom:var(--s-md);
+}
+.ds-row{
+  display:grid;
+  grid-template-columns:72px 1fr;
+  padding:var(--s-md) var(--s-sm);
+  border-bottom:1px solid var(--border);
+  align-items:flex-start;
+  gap:var(--s-sm);
+  position:relative;
+}
+.ds-row:last-child{border-bottom:0}
+.ds-row dt{
+  font-family:var(--font-mono);
+  font-size:var(--t-2xs);
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--muted-fg);
+  padding-top:3px;
+}
+.ds-row dd strong{
+  display:block;
+  font-family:var(--font-display);
+  font-size:.95rem;
+  letter-spacing:.02em;
+  margin-bottom:2px;
+  line-height:1.2;
+}
+.ds-row dd span{
+  font-family:var(--font-mono);
+  font-size:var(--t-xs);
+  color:var(--muted-fg);
+  letter-spacing:.02em;
+}
+.ds-row--accent{
+  background:color-mix(in srgb, var(--accent) 7%, transparent);
+  position:relative;
+}
+.ds-row--accent::before{
+  content:"";
+  position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--accent);
+}
+.ds-row--accent dt{color:var(--accent)}
+.ds-row--accent dd strong{color:var(--accent)}
+
+.axial-meta{
+  margin-top:var(--s-md);padding-top:var(--s-md);
+  border-top:1px dashed var(--border);
+  display:grid;grid-template-columns:1fr 1fr;gap:var(--s-sm) var(--s-md);
+  font-family:var(--font-mono);font-size:var(--t-xs);color:var(--muted-fg);
+}
+.axial-meta strong{color:var(--fg);display:block;font-weight:500;letter-spacing:.04em;text-transform:uppercase;font-size:var(--t-2xs);margin-bottom:2px}
+
+@media(max-width:980px){
+  .consultor{grid-template-columns:1fr;gap:var(--s-xl)}
+}
+
+/* ============================================================
+   AUDIENCES — para quem
+   ============================================================ */
+.audiences{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:var(--s-sm);
+}
+.aud{
+  padding:var(--s-lg);
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  background:var(--bg);
+  transition:transform .2s ease, border-color .2s ease;
+  position:relative;
+}
+.aud:hover{border-color:var(--primary);transform:translateY(-2px)}
+.aud-icon{
+  width:40px;height:40px;border-radius:var(--r-sm);
+  background:var(--muted);
+  display:grid;place-items:center;
+  margin-bottom:var(--s-md);color:var(--primary);
+}
+.aud h3{font-family:var(--font-display);font-size:var(--t-md);margin-bottom:var(--s-xs);line-height:1.25}
+.aud p{font-size:var(--t-sm);color:var(--muted-fg)}
+@media(max-width:960px){.audiences{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.audiences{grid-template-columns:1fr}}
+
+/* ============================================================
+   FRENTES — em desenvolvimento
+   ============================================================ */
+.frentes{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s-md);
+}
+.frente{
+  position:relative;
+  padding:var(--s-xl);
+  border:1px dashed var(--border-strong);
+  border-radius:var(--r-md);
+  background:repeating-linear-gradient(135deg,var(--bg) 0 12px,var(--muted) 12px 13px);
+}
+.frente-tag{
+  display:inline-flex;align-items:center;gap:var(--s-xs);
+  font-family:var(--font-mono);font-size:var(--t-2xs);
+  letter-spacing:.14em;text-transform:uppercase;
+  color:color-mix(in srgb, var(--accent) 70%, #000);background:rgba(94,130,176,.1);
+  padding:var(--s-2xs) var(--s-xs);border-radius:var(--r-sm);
+  margin-bottom:var(--s-md);
+}
+.frente-tag .pulse{width:6px;height:6px;border-radius:50%;background:var(--accent);
+  animation:pulse 1.8s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}}
+.frente h3{margin-bottom:var(--s-xs);max-width:22ch}
+.frente p{color:var(--muted-fg);max-width:46ch}
+@media(max-width:860px){.frentes{grid-template-columns:1fr}}
+
+/* ============================================================
+   CTA / CONTATO
+   ============================================================ */
+/* Bloco contato — inversão automática light/dark: bg=primary, texto=--bg */
+.contato{
+  background:var(--primary);color:var(--bg);
+  border-bottom:0;
+}
+.contato .section-num{color:color-mix(in srgb,var(--bg) 55%,transparent)}
+.contato .section-num::before{color:var(--accent)}
+.contato h2{color:var(--bg);max-width:20ch}
+.contato .section-lede{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.contact-grid{
+  display:grid;grid-template-columns:1.4fr 1fr;gap:var(--s-md);
+  margin-top:var(--s-xl);
+}
+.contact-card{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:var(--s-xl);
+  border:1px solid color-mix(in srgb,var(--bg) 14%,transparent);
+  background:color-mix(in srgb,var(--bg) 3%,transparent);
+  border-radius:var(--r-md);
+  transition:background .25s ease, border-color .25s ease, transform .15s ease;
+  gap:var(--s-md);
+}
+.contact-card:hover{background:color-mix(in srgb,var(--bg) 7%,transparent);border-color:color-mix(in srgb,var(--bg) 40%,transparent)}
+.contact-card:active{transform:scale(.99);transition-duration:.08s}
+.contact-card .label{
+  font-family:var(--font-mono);font-size:var(--t-2xs);
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  margin-bottom:var(--s-xs);
+}
+.contact-card h3{margin-bottom:var(--s-xs)}
+.contact-card p{color:color-mix(in srgb,var(--bg) 65%,transparent);font-size:var(--t-sm);max-width:36ch}
+.contact-value{
+  font-family:var(--font-mono);font-size:var(--t-sm);
+  color:var(--bg);text-align:right;letter-spacing:.04em;
+}
+.contact-value strong{display:block;font-size:var(--t-2xs);color:var(--accent);letter-spacing:.16em;text-transform:uppercase;font-weight:500;margin-bottom:2px}
+
+.assurances{
+  margin-top:var(--s-xl);padding-top:var(--s-lg);
+  border-top:1px solid color-mix(in srgb,var(--bg) 14%,transparent);
+  display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-md);
+  font-family:var(--font-mono);font-size:var(--t-xs);
+  color:color-mix(in srgb,var(--bg) 70%,transparent);
+}
+.assurances div{display:flex;gap:var(--s-xs);align-items:flex-start}
+.assurances svg{flex-shrink:0;margin-top:2px;color:var(--accent)}
+.assurances strong{display:block;color:var(--bg);font-weight:500;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+
+@media(max-width:860px){
+  .contact-grid{grid-template-columns:1fr}
+  .contact-card{flex-direction:column;align-items:flex-start;text-align:left}
+  .contact-value{text-align:left}
+  .assurances{grid-template-columns:1fr;gap:var(--s-sm)}
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  background:#0E0E0C;color:rgba(255,255,255,.72);
+  padding:var(--s-3xl) 0 var(--s-md);
+}
+.foot-grid{
+  display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;
+  gap:var(--s-xl);
+}
+.foot-brand{margin-bottom:var(--s-md)}
+.foot-brand .logo{height:88px;width:auto;display:block;margin-bottom:var(--s-sm)}
+@media(max-width:520px){.foot-brand .logo{height:64px}}
+.foot-tag{font-size:var(--t-sm);max-width:32ch;margin-bottom:var(--s-md)}
+.foot h3{
+  font-family:var(--font-mono);font-size:var(--t-2xs);font-weight:500;
+  letter-spacing:.18em;text-transform:uppercase;color:#fff;
+  margin-bottom:var(--s-md);
+}
+.foot ul{list-style:none;display:grid;gap:var(--s-xs)}
+.foot a{font-size:var(--t-sm);color:rgba(255,255,255,.72);transition:color .15s ease}
+.foot a:hover{color:#fff}
+.foot-bottom{
+  margin-top:var(--s-2xl);padding-top:var(--s-md);
+  border-top:1px solid rgba(255,255,255,.08);
+  display:flex;justify-content:space-between;
+  font-family:var(--font-mono);font-size:var(--t-2xs);
+  letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(255,255,255,.45);
+}
+.colophon{
+  margin-top:var(--s-md);
+  padding-top:var(--s-md);
+  border-top:1px dashed rgba(255,255,255,.08);
+  font-family:var(--font-mono);font-size:var(--t-2xs);
+  letter-spacing:.06em;
+  color:rgba(255,255,255,.4);
+  text-align:center;
+  font-style:italic;
+}
+.colophon strong{
+  color:rgba(255,255,255,.7);font-style:normal;font-weight:500;
+  letter-spacing:.08em;
+}
+@media(max-width:860px){
+  .foot-grid{grid-template-columns:1fr 1fr;gap:var(--s-lg)}
+  .foot-bottom{flex-direction:column;gap:var(--s-xs)}
+}
+@media(max-width:520px){.foot-grid{grid-template-columns:1fr}}
+
+/* ============================================================
+   REVEAL — scroll + hero load
+   ============================================================ */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .8s ease,transform .8s ease}
+.reveal.in{opacity:1;transform:none}
+
+@keyframes hero-rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes hero-fade{from{opacity:0}to{opacity:1}}
+.hero .eyebrow{animation:hero-rise .9s cubic-bezier(.2,.7,.2,1) both;animation-delay:.05s}
+.hero h1{animation:hero-rise 1s cubic-bezier(.2,.7,.2,1) both;animation-delay:.2s}
+.hero-sub{animation:hero-rise .9s cubic-bezier(.2,.7,.2,1) both;animation-delay:.4s}
+.hero-cta{animation:hero-rise .9s cubic-bezier(.2,.7,.2,1) both;animation-delay:.55s}
+.hero-stats{animation:hero-rise .9s cubic-bezier(.2,.7,.2,1) both;animation-delay:.7s}
+.hero-figure{animation:hero-fade 1.2s ease both;animation-delay:.55s}
+
+@media(prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  .hero .eyebrow,.hero h1,.hero-sub,.hero-cta,.hero-stats,.hero-figure{animation:none}
+}
+</style>
+</head>
+
+<body>
+<a href="#main" class="skip">Pular para o conteúdo</a>
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+<!-- ============================================================
+     TOP RAIL — editorial masthead
+     ============================================================ -->
+<div class="rail" aria-hidden="true">
+  <div class="rail-inner">
+    <div><span class="dot"></span>São Paulo · Brasil · LGPD compliant</div>
+    <div class="rail-meta">
+      <span>Vol. 01</span>
+      <span>2026</span>
+      <span>Consultoria técnico-médica</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TOPBAR
+     ============================================================ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/" aria-label="Etiometrix — Página inicial">
+      <!-- Logo oficial Etiometrix · Horizontal Light (DS) -->
+      <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="55 60 700 175" role="img" aria-label="Etiometrix">
+        <g>
+          <path fill="currentColor" d="M233.07,151.19h31.59V155H233.07v21.26h34.05v4H229V126.3H266.2v3.93H233.07Z"/>
+          <path fill="currentColor" d="M294.78,130.08H275.29v-3.7h43.15v3.7h-19.5v50.15h-4.16Z"/>
+          <path fill="currentColor" d="M326.37,180.23V126.3h4.09v53.93Z"/>
+          <path fill="currentColor" d="M396,153.34c-.08,14.18-9.09,27.81-27.2,27.81s-27.19-13.71-27.19-28c0-14.48,9-27.74,27.19-27.74S396.1,138.78,396,153.34Zm-50.31-.07c.08,12.17,7.78,24,23.11,24s23.19-11.86,23.19-24c0-12.48-7.7-24-23.19-24S345.63,140.55,345.71,153.27Z"/>
+          <path fill="currentColor" d="M453,132.31,432.31,163.9h-1.39l-20.8-31.59v47.92H406V126.3h4.93l20.65,31.43L452,126.3H457v53.93H453Z"/>
+          <path fill="currentColor" d="M473,151.19h31.59V155H473v21.26H507v4H468.91V126.3h37.21v3.93H473Z"/>
+          <path fill="currentColor" d="M534.7,130.08H515.21v-3.7h43.15v3.7h-19.5v50.15H534.7Z"/>
+          <path fill="currentColor" d="M609.28,180.23h-5.47l-18.64-20.42H570.45v20.42h-4.16V126.3H590c11.71,0,17.65,8.4,17.72,16.8.08,8.78-5.7,16.48-17.49,16.48Zm-38.83-24.35h19.11c9.4,0,13.56-5.31,13.64-12.86.07-6.32-4.24-12.87-13.18-12.87H570.45Z"/>
+          <path fill="currentColor" d="M616.3,180.23V126.3h4.08v53.93Z"/>
+          <path fill="currentColor" d="M668.38,126.38h4.47v.08l-18.34,26.11,19.8,27.58v.08h-4.93L652,155.58l-17.41,24.65h-4.93v-.08l19.8-27.58-18.34-26.11v-.08h4.54l16.34,23Z"/>
+          <rect fill="#5E82B0" x="73.57" y="140.31" width="70.38" height="14.05" transform="translate(-72.32 120.06) rotate(-45)"/>
+          <rect fill="#5E82B0" x="93.44" y="160.18" width="70.38" height="14.05" transform="translate(-80.55 139.93) rotate(-45)"/>
+          <rect fill="#5E82B0" x="113.31" y="180.04" width="70.38" height="14.05" transform="translate(-88.78 159.8) rotate(-45)"/>
+          <rect fill="currentColor" x="94.25" y="99.66" width="70.38" height="14.08" transform="translate(-37.54 122.79) rotate(-45)"/>
+          <rect fill="currentColor" x="114.16" y="119.57" width="70.38" height="14.08" transform="translate(-45.78 142.69) rotate(-45)"/>
+          <rect fill="currentColor" x="134.07" y="139.48" width="70.38" height="14.08" transform="translate(-54.03 162.6) rotate(-45)"/>
+        </g>
+      </svg>
+    </a>
+    <nav class="nav" aria-label="Navegação principal">
+      <a href="#servicos">Serviços</a>
+      <a href="#metodo">Método</a>
+      <a href="#consultor">Consultor</a>
+      <a href="#publico">Para quem</a>
+      <a href="#contato">Contato</a>
+    </nav>
+    <a class="btn btn-accent" href="#contato">
+      Submeter caso
+      <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </a>
+    <button class="burger" id="burger" aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="drawer"><span></span></button>
+  </div>
+</header>
+
+<!-- Mobile drawer -->
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menu de navegação">
+  <nav aria-label="Navegação móvel">
+    <a href="#servicos" data-close>Serviços</a>
+    <a href="#metodo" data-close>Método</a>
+    <a href="#consultor" data-close>Consultor</a>
+    <a href="#publico" data-close>Para quem</a>
+    <a href="#contato" data-close>Contato</a>
+  </nav>
+  <a class="btn btn-accent" href="#contato" data-close>
+    Submeter caso
+    <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+  </a>
+  <div class="drawer-meta">São Paulo · LGPD compliant · Vol. 01 · 2026</div>
+</div>
+
+<main id="main">
+
+  <!-- ============================================================
+       HERO
+       ============================================================ -->
+  <section class="hero" aria-labelledby="hero-h">
+    <div class="shell">
+      <div class="hero-grid">
+        <div>
+          <h1 id="hero-h">
+            Análise técnica de <span class="accent">nexo causal</span> em eventos médico-hospitalares
+          </h1>
+          <p class="hero-sub">
+            Convergência entre Medicina, Engenharia e Análise de Dados. Pareceres para sustentar — ou refutar — uma tese técnica.
+          </p>
+
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#contato">
+              Submeter caso para análise
+              <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
+            <a class="btn btn-ghost" href="#servicos">
+              Ver entregáveis
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+            </a>
+          </div>
+
+          <dl class="hero-stats">
+            <div class="stat">
+              <dt>Método em prática</dt>
+              <dd>13<small>+ anos</small></dd>
+            </div>
+            <div class="stat">
+              <dt>Formações convergentes</dt>
+              <dd>03<small>·áreas</small></dd>
+            </div>
+            <div class="stat">
+              <dt>Entregáveis técnicos</dt>
+              <dd>04<small>· serviços</small></dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- VENN DIAGRAM -->
+        <aside class="hero-figure" aria-labelledby="fig01">
+          <span class="fig-label" id="fig01">FIG. 01 — Convergência analítica</span>
+          <div class="venn-wrap">
+            <svg class="venn" viewBox="0 0 420 380" role="img" aria-label="Diagrama de Venn: Medicina, Engenharia e Dados convergindo em Etiometrix">
+              <defs>
+                <radialGradient id="vg" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#5E82B0" stop-opacity=".10"/>
+                  <stop offset="100%" stop-color="#5E82B0" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+
+              <!-- Three identical circles, equilateral arrangement -->
+              <g fill="url(#vg)" stroke="currentColor" stroke-width="1" stroke-opacity=".55">
+                <circle cx="155" cy="155" r="92"/>
+                <circle cx="265" cy="155" r="92"/>
+                <circle cx="210" cy="250" r="92"/>
+              </g>
+
+              <!-- Connector ticks from labels to circle edges -->
+              <g stroke="currentColor" stroke-opacity=".25" stroke-dasharray="2 3" stroke-width="1" fill="none">
+                <line x1="90"  y1="55" x2="125" y2="92"/>
+                <line x1="330" y1="55" x2="295" y2="92"/>
+                <line x1="210" y1="358" x2="210" y2="343"/>
+              </g>
+
+              <!-- Outside labels -->
+              <g font-family="Archivo Black, sans-serif" font-size="13" fill="currentColor" letter-spacing="1.4">
+                <text x="90"  y="45" text-anchor="middle">MEDICINA</text>
+                <text x="330" y="45" text-anchor="middle">ENGENHARIA</text>
+                <text x="210" y="372" text-anchor="middle">DADOS</text>
+              </g>
+
+              <!-- Subtitle ticks (axes) -->
+              <g font-family="JetBrains Mono, monospace" font-size="8" fill="#5A5A57" letter-spacing="1">
+                <text x="90"  y="58" text-anchor="middle" opacity=".7">eixo · clínico</text>
+                <text x="330" y="58" text-anchor="middle" opacity=".7">eixo · técnico</text>
+                <text x="210" y="350" text-anchor="middle" opacity=".7">eixo · documental</text>
+              </g>
+
+              <!-- Convergence node — at centroid -->
+              <g transform="translate(210 187)">
+                <circle r="34" fill="none" stroke="#5E82B0" stroke-opacity=".18" stroke-width="1"/>
+                <circle r="22" fill="none" stroke="#5E82B0" stroke-opacity=".35" stroke-width="1"/>
+                <circle r="12" fill="currentColor"/>
+                <circle r="4"  fill="#5E82B0"/>
+              </g>
+              <!-- Convergence caption -->
+              <g transform="translate(210 245)">
+                <line x1="0" y1="-8" x2="0" y2="0" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="1 2"/>
+                <text y="14" text-anchor="middle" font-family="Archivo Black, sans-serif" font-size="11" fill="currentColor" letter-spacing="1.6">ETIOMETRIX</text>
+                <text y="28" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#5A5A57" letter-spacing="1">convergência triaxial</text>
+              </g>
+            </svg>
+          </div>
+          <div class="venn-cap">
+            Tríplice intersecção · análise causal sustentada por <strong>método científico, evidência documental e literatura técnica</strong>.
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SERVICES
+       ============================================================ -->
+  <section class="block" id="servicos" aria-labelledby="svc-h">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div>
+          <div class="section-num">01 · Serviços</div>
+          <h2 id="svc-h">Quatro entregáveis técnicos para sustentar decisões.</h2>
+        </div>
+        <p class="section-lede">
+          Cada produto é autônomo — contratado isolado ou combinado em estratégia integrada.
+        </p>
+      </div>
+
+      <div class="services-grid reveal">
+
+        <article class="service">
+          <div class="svc-head">
+            <div class="svc-num">01</div>
+            <div class="svc-tag">Documental</div>
+          </div>
+          <h3>Análise de Prontuários</h3>
+          <p>Leitura técnica do registro médico: o que está documentado, o que falta, o que sustenta ou descarta o nexo.</p>
+          <a class="svc-link" href="#contato">Solicitar análise <svg class="arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </article>
+
+        <article class="service">
+          <div class="svc-head">
+            <div class="svc-num">02</div>
+            <div class="svc-tag">Causalidade</div>
+          </div>
+          <h3>Análise de Nexo Causal</h3>
+          <p>Relação entre conduta, dispositivo ou intercorrência e desfecho — à luz da literatura e da documentação.</p>
+          <a class="svc-link" href="#contato">Solicitar análise <svg class="arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </article>
+
+        <article class="service">
+          <div class="svc-head">
+            <div class="svc-num">03</div>
+            <div class="svc-tag">Triagem</div>
+          </div>
+          <h3>Viabilidade Processual</h3>
+          <p>Triagem antes do ajuizamento. Indica se há consistência documental para sustentar a demanda.</p>
+          <a class="svc-link" href="#contato">Solicitar análise <svg class="arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </article>
+
+        <article class="service">
+          <div class="svc-head">
+            <div class="svc-num">04</div>
+            <div class="svc-tag">Pericial</div>
+          </div>
+          <h3>Quesitação Técnica</h3>
+          <p>Quesitos para perícia judicial e contraditório técnico a laudos. Assistência técnica com profundidade em Medicina e Engenharia.</p>
+          <a class="svc-link" href="#contato">Solicitar análise <svg class="arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PULL QUOTE — Manifesto editorial
+       ============================================================ -->
+  <section class="pull" aria-label="Manifesto técnico">
+    <div class="shell">
+      <div class="pull-inner reveal">
+        <div class="pull-mark" aria-hidden="true">§</div>
+        <blockquote class="pull-quote">
+          <p>O parecer técnico não é peça de retórica. <em>É documento</em> — auditável, referenciado, fundado em método.</p>
+        </blockquote>
+        <div class="pull-attr">
+          <span class="pull-rule"></span>
+          <span class="pull-by">Princípio operacional · Etiometrix</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       METHODOLOGY
+       ============================================================ -->
+  <section class="block" id="metodo" aria-labelledby="met-h">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div>
+          <div class="section-num">02 · Método</div>
+          <h2 id="met-h">Da submissão ao parecer, um fluxo verificável.</h2>
+        </div>
+        <p class="section-lede">
+          Quatro etapas. O mesmo protocolo — muda a profundidade, não o método.
+        </p>
+      </div>
+
+      <div class="method-rail reveal">
+        <div class="method-step is-accent">
+          <div class="dot">01</div>
+          <h3>Submissão e triagem</h3>
+          <p>Envio confidencial dos documentos. Resposta em 48h úteis com viabilidade técnica.</p>
+        </div>
+        <div class="method-step">
+          <div class="dot">02</div>
+          <h3>Mapeamento documental</h3>
+          <p>Cronologia clínica, identificação de lacunas e marcos críticos do evento.</p>
+        </div>
+        <div class="method-step">
+          <div class="dot">03</div>
+          <h3>Análise causal</h3>
+          <p>Confronto com literatura técnica, diretrizes assistenciais e padrões de engenharia.</p>
+        </div>
+        <div class="method-step">
+          <div class="dot">04</div>
+          <h3>Parecer final</h3>
+          <p>Documento fundamentado, referenciado, com conclusões objetivas e quesitos sugeridos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CONSULTOR
+       ============================================================ -->
+  <section class="block" id="consultor" aria-labelledby="cs-h">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div>
+          <div class="section-num">03 · Consultor</div>
+          <h2 id="cs-h">Uma análise. Três formações convergentes.</h2>
+        </div>
+        <p class="section-lede">
+          O método Etiometrix nasce da prática integrada — não da soma de pareceristas isolados.
+        </p>
+      </div>
+
+      <div class="consultor reveal">
+
+        <div class="consultor-card">
+          <div class="cc-eyebrow">Consultor responsável</div>
+          <h3 class="cc-name">
+            <small>Dr.</small>
+            Edgar Rezende Marques
+          </h3>
+          <ul class="cc-roles" aria-label="Áreas de formação">
+            <li>Médico</li>
+            <li>Eng. Metalúrgico</li>
+            <li>Perito Assistente</li>
+          </ul>
+          <p class="cc-bio">
+            13+ anos integrando medicina clínica, engenharia de materiais e perícia médica em análise causal documental.
+          </p>
+
+          <div class="formation">
+            <div class="formation-title">Formação acadêmica</div>
+            <ul class="formation-list">
+              <li>
+                <div class="degree-num">01</div>
+                <div class="degree">
+                  <h4>Medicina</h4>
+                  <div class="inst">PUC / SP</div>
+                  <div class="focus">Clínica médica · Formação e atuação hospitalar</div>
+                </div>
+              </li>
+              <li>
+                <div class="degree-num">02</div>
+                <div class="degree">
+                  <h4>Engenharia Metalúrgica</h4>
+                  <div class="inst">Escola Politécnica · USP</div>
+                  <div class="focus">Falha de materiais · Biomecânica de implantes</div>
+                </div>
+              </li>
+              <li>
+                <div class="degree-num">03</div>
+                <div class="degree">
+                  <h4>Pós em Perícia Médica</h4>
+                  <div class="inst">Hospital Israelita Albert Einstein</div>
+                  <div class="focus">Análise documental · Pareceres técnico-assistenciais</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <aside class="axial" aria-labelledby="fig02">
+          <div class="axial-figcap">
+            <span id="fig02">FIG. 02 · Dossiê do consultor</span>
+            <span>ref. ETX-001</span>
+          </div>
+
+          <dl class="datasheet">
+            <div class="ds-row">
+              <dt>Eixo I</dt>
+              <dd>
+                <strong>MEDICINA</strong>
+                <span>PUC / SP · clínica e hospitalar</span>
+              </dd>
+            </div>
+            <div class="ds-row">
+              <dt>Eixo II</dt>
+              <dd>
+                <strong>ENG. METALÚRGICA</strong>
+                <span>Escola Politécnica · USP</span>
+              </dd>
+            </div>
+            <div class="ds-row">
+              <dt>Eixo III</dt>
+              <dd>
+                <strong>PERÍCIA MÉDICA</strong>
+                <span>Hospital Albert Einstein · pós</span>
+              </dd>
+            </div>
+            <div class="ds-row ds-row--accent">
+              <dt>Síntese</dt>
+              <dd>
+                <strong>ETIOMETRIX</strong>
+                <span>Método integrado · São Paulo · 2026</span>
+              </dd>
+            </div>
+          </dl>
+
+          <div class="axial-meta">
+            <div><strong>Prática</strong>13+ anos</div>
+            <div><strong>Áreas</strong>03 ativas</div>
+            <div><strong>Responsabilidade</strong>Pessoal</div>
+            <div><strong>Conformidade</strong>LGPD</div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       AUDIENCES
+       ============================================================ -->
+  <section class="block" id="publico" aria-labelledby="aud-h">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div>
+          <div class="section-num">04 · Para quem</div>
+          <h2 id="aud-h">Quatro frentes profissionais atendidas.</h2>
+        </div>
+        <p class="section-lede">
+          A linguagem do parecer é calibrada ao destinatário — jurídico, regulatório, gestor ou técnico-industrial.
+        </p>
+      </div>
+
+      <div class="audiences reveal">
+        <div class="aud">
+          <div class="aud-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg>
+          </div>
+          <h3>Escritórios de Advocacia</h3>
+          <p>Pareceres técnicos para ações de responsabilidade civil médica e hospitalar.</p>
+        </div>
+        <div class="aud">
+          <div class="aud-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-12V5l-8-3-8 3v5c0 8 8 12 8 12z"/></svg>
+          </div>
+          <h3>Seguradoras</h3>
+          <p>Análise técnica de sinistros de saúde e avaliação de risco em eventos adversos.</p>
+        </div>
+        <div class="aud">
+          <div class="aud-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v8M8 12h8M5 4h14v16H5z"/></svg>
+          </div>
+          <h3>Hospitais &amp; Operadoras</h3>
+          <p>Suporte técnico em defesa de processos e gestão de risco assistencial.</p>
+        </div>
+        <div class="aud">
+          <div class="aud-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9c.5.2.9.5 1.2 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+          </div>
+          <h3>Indústria de Dispositivos</h3>
+          <p>Análise de falhas em implantes, equipamentos médicos e vigilância pós-mercado.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FRENTES EM EXPANSÃO
+       ============================================================ -->
+  <section class="block" aria-labelledby="fr-h">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div>
+          <div class="section-num">05 · Frentes em expansão</div>
+          <h2 id="fr-h">Áreas em desenvolvimento ativo.</h2>
+        </div>
+        <p class="section-lede">
+          Alinhadas à expansão da Etiometrix em engenharia biomédica e auditoria de sistemas digitais de saúde.
+        </p>
+      </div>
+
+      <div class="frentes reveal">
+        <article class="frente">
+          <span class="frente-tag"><span class="pulse"></span> Em desenvolvimento</span>
+          <h3>Auditoria de Sistemas Digitais de Saúde</h3>
+          <p>Falhas em sistemas de registro eletrônico, alarmes e monitorização com impacto em eventos adversos.</p>
+        </article>
+        <article class="frente">
+          <span class="frente-tag"><span class="pulse"></span> Em desenvolvimento</span>
+          <h3>Auditoria de Sistemas de OPME para Operadoras</h3>
+          <p>Indicações, especificações e procedências de OPME em processos de autorização prévia e glosa de operadoras.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CONTATO
+       ============================================================ -->
+  <section class="block contato" id="contato" aria-labelledby="ct-h">
+    <div class="shell">
+      <div class="section-head reveal">
+        <div>
+          <div class="section-num">06 · Contato</div>
+          <h2 id="ct-h">Conversemos sobre o seu caso.</h2>
+        </div>
+        <p class="section-lede">
+          Sem formulários. Escolha o canal — toda submissão é triada pessoalmente.
+        </p>
+      </div>
+
+      <div class="contact-grid reveal">
+        <a class="contact-card" href="https://wa.me/5511976499800?text=Ol%C3%A1%2C%20Dr.%20Edgar.%20Gostaria%20de%20conversar%20sobre%20uma%20an%C3%A1lise%20t%C3%A9cnica%20de%20nexo%20causal." target="_blank" rel="noopener">
+          <div>
+            <div class="label">Canal preferencial</div>
+            <h3>WhatsApp profissional</h3>
+            <p>Resposta rápida, contexto inicial em poucas mensagens.</p>
+          </div>
+          <div class="contact-value">
+            <strong>iniciar conversa</strong>
+            +55 (11) 97649-9800
+          </div>
+        </a>
+        <a class="contact-card" href="mailto:contato@etiometrix.com.br?subject=Submiss%C3%A3o%20de%20caso%20-%20An%C3%A1lise%20T%C3%A9cnica&body=Ol%C3%A1%2C%20Dr.%20Edgar.">
+          <div>
+            <div class="label">Submissão formal</div>
+            <h3>E-mail com documentos</h3>
+            <p>Ideal para anexar prontuários, laudos e peças processuais.</p>
+          </div>
+          <div class="contact-value">
+            <strong>enviar e-mail</strong>
+            contato@etiometrix.com.br
+          </div>
+        </a>
+      </div>
+
+      <div class="assurances reveal">
+        <div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div><strong>48h úteis</strong>Triagem pessoal do consultor</div>
+        </div>
+        <div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10V6l-8-4z"/></svg>
+          <div><strong>Sigilo absoluto</strong>Conformidade LGPD &amp; segredo profissional</div>
+        </div>
+        <div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <div><strong>Atendimento nacional</strong>Remoto · Presencial sob demanda</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+  <div class="shell">
+    <div class="foot-grid">
+      <div class="foot">
+        <div class="foot-brand">
+          <!-- Logo oficial Etiometrix · Horizontal Dark (DS) -->
+          <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="55 60 700 175" role="img" aria-label="Etiometrix">
+            <g>
+              <path fill="#DEE3E4" d="M233.07,151.19h31.59V155H233.07v21.26h34.05v4H229V126.3H266.2v3.93H233.07Z"/>
+              <path fill="#DEE3E4" d="M294.78,130.08H275.29v-3.7h43.15v3.7h-19.5v50.15h-4.16Z"/>
+              <path fill="#DEE3E4" d="M326.37,180.23V126.3h4.09v53.93Z"/>
+              <path fill="#DEE3E4" d="M396,153.34c-.08,14.18-9.09,27.81-27.2,27.81s-27.19-13.71-27.19-28c0-14.48,9-27.74,27.19-27.74S396.1,138.78,396,153.34Zm-50.31-.07c.08,12.17,7.78,24,23.11,24s23.19-11.86,23.19-24c0-12.48-7.7-24-23.19-24S345.63,140.55,345.71,153.27Z"/>
+              <path fill="#DEE3E4" d="M453,132.31,432.31,163.9h-1.39l-20.8-31.59v47.92H406V126.3h4.93l20.65,31.43L452,126.3H457v53.93H453Z"/>
+              <path fill="#DEE3E4" d="M473,151.19h31.59V155H473v21.26H507v4H468.91V126.3h37.21v3.93H473Z"/>
+              <path fill="#DEE3E4" d="M534.7,130.08H515.21v-3.7h43.15v3.7h-19.5v50.15H534.7Z"/>
+              <path fill="#DEE3E4" d="M609.28,180.23h-5.47l-18.64-20.42H570.45v20.42h-4.16V126.3H590c11.71,0,17.65,8.4,17.72,16.8.08,8.78-5.7,16.48-17.49,16.48Zm-38.83-24.35h19.11c9.4,0,13.56-5.31,13.64-12.86.07-6.32-4.24-12.87-13.18-12.87H570.45Z"/>
+              <path fill="#DEE3E4" d="M616.3,180.23V126.3h4.08v53.93Z"/>
+              <path fill="#DEE3E4" d="M668.38,126.38h4.47v.08l-18.34,26.11,19.8,27.58v.08h-4.93L652,155.58l-17.41,24.65h-4.93v-.08l19.8-27.58-18.34-26.11v-.08h4.54l16.34,23Z"/>
+              <rect fill="#5E82B0" x="73.57" y="140.31" width="70.38" height="14.05" transform="translate(-72.32 120.06) rotate(-45)"/>
+              <rect fill="#5E82B0" x="93.44" y="160.18" width="70.38" height="14.05" transform="translate(-80.55 139.93) rotate(-45)"/>
+              <rect fill="#5E82B0" x="113.31" y="180.04" width="70.38" height="14.05" transform="translate(-88.78 159.8) rotate(-45)"/>
+              <rect fill="#AEBBC0" x="94.25" y="99.66" width="70.38" height="14.08" transform="translate(-37.54 122.79) rotate(-45)"/>
+              <rect fill="#AEBBC0" x="114.16" y="119.57" width="70.38" height="14.08" transform="translate(-45.78 142.69) rotate(-45)"/>
+              <rect fill="#AEBBC0" x="134.07" y="139.48" width="70.38" height="14.08" transform="translate(-54.03 162.6) rotate(-45)"/>
+            </g>
+          </svg>
+        </div>
+        <p class="foot-tag">Rigor científico na convergência entre Medicina, Engenharia e Análise de Dados.</p>
+      </div>
+      <div class="foot">
+        <h3>Navegação</h3>
+        <ul>
+          <li><a href="#servicos">Serviços</a></li>
+          <li><a href="#metodo">Método</a></li>
+          <li><a href="#consultor">Consultor</a></li>
+          <li><a href="#publico">Para quem</a></li>
+        </ul>
+      </div>
+      <div class="foot">
+        <h3>Contato</h3>
+        <ul>
+          <li><a href="mailto:contato@etiometrix.com.br">contato@etiometrix.com.br</a></li>
+          <li><a href="https://wa.me/5511976499800" target="_blank" rel="noopener">WhatsApp profissional</a></li>
+          <li><a href="https://www.linkedin.com/in/etiometrix/" target="_blank" rel="noopener">LinkedIn</a></li>
+        </ul>
+      </div>
+      <div class="foot">
+        <h3>Legal</h3>
+        <ul>
+          <li><a href="/politica-privacidade">Política de Privacidade</a></li>
+          <li><a href="/termos-uso">Termos de Uso</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div>© 2026 Etiometrix · Todos os direitos reservados</div>
+      <div>etiometrix.com.br · v1.0</div>
+    </div>
+    <div class="colophon" aria-label="Colofão">
+      Composto em <strong>Roboto</strong> e <strong>Archivo Black</strong> · dados técnicos em <strong>JetBrains Mono</strong> · Vol. 01 · São Paulo · MMXXVI
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal com stagger + fallback de segurança
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('in'), i * 40);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
+  reveals.forEach(el => io.observe(el));
+
+  // Fallback: garante que tudo apareça após 1.8s (caso observer não dispare em algum cenário)
+  setTimeout(() => {
+    reveals.forEach(el => { if (!el.classList.contains('in')) el.classList.add('in'); });
+  }, 1800);
+
+  // Imediato: revela qualquer elemento já visível no carregamento (above-the-fold)
+  requestAnimationFrame(() => {
+    const vh = window.innerHeight;
+    reveals.forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.top < vh * .95 && r.bottom > 0) el.classList.add('in');
+    });
+  });
+
+  // Mobile drawer
+  const burger = document.getElementById('burger');
+  const drawer = document.getElementById('drawer');
+  function setDrawer(open) {
+    drawer.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    burger.setAttribute('aria-label', open ? 'Fechar menu de navegação' : 'Abrir menu de navegação');
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+  burger.addEventListener('click', () => setDrawer(!drawer.classList.contains('open')));
+  drawer.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => setDrawer(false)));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && drawer.classList.contains('open')) setDrawer(false); });
+
+  // Scroll-spy — destaca seção atual no nav
+  const navLinks = Array.from(document.querySelectorAll('.nav a[href^="#"]'));
+  const navMap = new Map();
+  navLinks.forEach(a => {
+    const id = a.getAttribute('href').slice(1);
+    const target = document.getElementById(id);
+    if (target) navMap.set(target, a);
+  });
+  const spyIO = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const link = navMap.get(entry.target);
+      if (!link) return;
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.removeAttribute('aria-current'));
+        link.setAttribute('aria-current','true');
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+  navMap.forEach((_link, section) => spyIO.observe(section));
+
+  // Scroll progress bar
+  const progress = document.getElementById('scrollProgress');
+  let ticking = false;
+  function updateProgress(){
+    const h = document.documentElement;
+    const scrolled = (h.scrollTop || document.body.scrollTop);
+    const max = (h.scrollHeight - h.clientHeight) || 1;
+    progress.style.width = (scrolled / max * 100) + '%';
+    ticking = false;
+  }
+  document.addEventListener('scroll', () => {
+    if (!ticking){ requestAnimationFrame(updateProgress); ticking = true; }
+  }, {passive:true});
+  updateProgress();
+</script>
+</body>
+</html>
