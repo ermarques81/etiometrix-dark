@@ -831,13 +831,20 @@ section.block{padding:var(--s-4xl) 0;border-bottom:1px solid var(--border);posit
   padding:var(--s-xl);
   border:1px dashed var(--border-strong);
   border-radius:var(--r-md);
-  background:repeating-linear-gradient(135deg,var(--bg) 0 12px,var(--muted) 12px 13px);
+  background:color-mix(in srgb, var(--fg) 3%, var(--bg));
+  transition:background .25s ease, border-color .25s ease;
+}
+.frente:hover{
+  background:color-mix(in srgb, var(--fg) 5%, var(--bg));
+  border-color:color-mix(in srgb, var(--accent) 50%, var(--border-strong));
 }
 .frente-tag{
   display:inline-flex;align-items:center;gap:var(--s-xs);
   font-family:var(--font-mono);font-size:var(--t-2xs);
   letter-spacing:.14em;text-transform:uppercase;
-  color:color-mix(in srgb, var(--accent) 70%, #000);background:rgba(94,130,176,.1);
+  color:color-mix(in srgb, var(--accent) 75%, var(--fg));
+  background:color-mix(in srgb, var(--accent) 14%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 28%, transparent);
   padding:var(--s-2xs) var(--s-xs);border-radius:var(--r-sm);
   margin-bottom:var(--s-md);
 }
